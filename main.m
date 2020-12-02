@@ -98,7 +98,7 @@ int main(int argc, const char * argv[]) {
     //   c e r t                 ^
     //                         rowid
     
-    export_validation_record(account, @"record_data.cms");
+    export_validation_record(account, @"validation_record.cms");
     
     export_certificates(account, @"certificate.pem");
 
