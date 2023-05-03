@@ -38,7 +38,8 @@ We build and run the extraction utility (note that you need a developer certific
 ```
 git clone https://github.com/seemoo-lab/airdrop-secret-extractor.git
 cd airdrop-secret-extractor
-make
+swift package codesign <your developer certificate>
+./codesign.sh # Currently there is some upstream issue for SPM plugin, so we need to run this script manually
 ./airdrop-secret-extractor
 ```
 The program will ask you for a passphrase to store the key component on disk. You should now have three items in the current directory:
@@ -53,3 +54,8 @@ The program will ask you for a passphrase to store the key component on disk. Yo
 Copy the three files into `~/.opendrop/keys`. When starting OpenDrop the next time, you will be asked to enter the passphrase for the key.
 
 Your OpenDrop instance should now be discoverable as one of your devices (`receive`) and should be able to discover your devices that are in contacts-only mode (`find` and `send`).
+
+## 4. Known issues on SPM Plugin
+
+- [ ] Plugin can't build a product with custom plugin flag. It will produce a error for unknwon link argument "-iframework"
+- [ ] The Plugin will fail to codesign it. Error message is "One or more parameters passed to a function were not valid.". Current have no idea how to fix it.

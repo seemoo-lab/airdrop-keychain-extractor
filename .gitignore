@@ -4,3 +4,5 @@ airdrop-secret-extractor
 # Output
 *.cms
 *.pem
+.swiftpm
+.vscode
