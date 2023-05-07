@@ -59,7 +59,7 @@ enum KeychainExtractor {
                 logger.error("Failed to get item")
                 return nil
             }
-            logger.info("Found certificate: \(item.debugDescription)")
+            logger.info("Found certificate: \(item.debugDescription, privacy: .public)")
             var data: CFData?
             let exportResult = SecItemExport(item, .formatPEMSequence, .pemArmour, nil, &data)
             guard exportResult == 0 else {
@@ -102,15 +102,24 @@ enum KeychainExtractor {
             logger.error("Failed to get item")
             return
         }
-        logger.info("Found key: \(item.debugDescription)")
+        logger.info("Found key: \(item.debugDescription, privacy: .public)")
 
-        var params: SecItemImportExportKeyParameters!
-        memset(&params, 0, MemoryLayout<SecItemImportExportKeyParameters>.stride)
-        params.version = UInt32(SEC_KEY_IMPORT_EXPORT_PARAMS_VERSION)
-        params.flags = .securePassphrase
-        params.alertPrompt = Unmanaged.passRetained(NSString(string: "Enter passphrase for private key"))
+        let alertTitle = Unmanaged.passRetained(NSString(string: "Keychain Extractor") as CFString)
+        let alertPrompt = Unmanaged.passRetained(NSString(string: "Enter passphrase for private key") as CFString)
+        var params = SecItemImportExportKeyParameters(
+            version: UInt32(SEC_KEY_IMPORT_EXPORT_PARAMS_VERSION),
+            flags: .securePassphrase,
+            passphrase: nil,
+            alertTitle: alertTitle,
+            alertPrompt: alertPrompt,
+            accessRef: nil,
+            keyUsage: nil,
+            keyAttributes: nil
+        )
         var data: CFData?
-        let exportResult = SecItemExport(item, .formatOpenSSL, [], &params, &data)
+        let exportResult = SecItemExport(item, .formatWrappedOpenSSL, [], &params, &data)
+        alertTitle.release()
+        alertPrompt.release()
         guard exportResult == 0 else {
             logger.error("Failed to export key: \(SecCopyErrorMessageString(exportResult, nil))")
             return
