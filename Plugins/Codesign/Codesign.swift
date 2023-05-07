@@ -1,6 +1,6 @@
 //
 //  Codesign.swift
-//  
+//
 //
 //  Created by Kyle on 2023/5/3.
 //
@@ -27,34 +27,35 @@ struct Codesign: CommandPlugin {
         let inputPath = keychainExtractor.path.string
         let outputPath = context.package.directory.string + "/airdrop-secret-extractor"
         
-        let cpTool = try context.tool(named: "cp")
-        let cpArgs = [inputPath, outputPath]
-        let cpToolURL = URL(fileURLWithPath: cpTool.path.string)
+        // Task 1: Copy the artifact
         do {
-            let process = try Process.run(cpToolURL, arguments: cpArgs)
+            let tool = try context.tool(named: "cp")
+            let args = [inputPath, outputPath]
+            let toolURL = URL(fileURLWithPath: tool.path.string)
+            let process = try Process.run(toolURL, arguments: args)
             process.waitUntilExit()
             
             // Check whether the subprocess invocation was successful.
-            guard process.terminationReason == .exit && process.terminationStatus == 0 else {
+            guard process.terminationReason == .exit, process.terminationStatus == 0 else {
                 let problem = "\(process.terminationReason):\(process.terminationStatus)"
-                Diagnostics.error("codesign invocation failed: \(problem)")
+                Diagnostics.error("cp invocation failed: \(problem)")
                 return
             }
             Diagnostics.remark("cp executable from \(inputPath) to \(outputPath)")
         }
         
-        let entitlementPath = context.package.directory.string + "/entitlements.plist"
-        let codesignTool = try context.tool(named: "codesign")
-        let certificate = arguments.first ?? "Apple Development"
-        let codesignArgs = ["-f", "-s", certificate, "--entitlements", entitlementPath, outputPath]
-        let codesignToolURL = URL(fileURLWithPath: codesignTool.path.string)
-        
+        // Task 2: Replacing existing signature (Need to disable swift-package sandbox via '--disable-sandbox')
         do {
-           let process = try Process.run(codesignToolURL, arguments: codesignArgs)
+            let entitlementPath = context.package.directory.string + "/entitlements.plist"
+            let tool = try context.tool(named: "codesign")
+            let certificate = arguments.first ?? "Apple Development"
+            let args = ["-f", "-s", certificate, "--entitlements", entitlementPath, outputPath]
+            let toolURL = URL(fileURLWithPath: tool.path.string)
+            let process = try Process.run(toolURL, arguments: args)
             process.waitUntilExit()
-        
+
             // Check whether the subprocess invocation was successful.
-            guard process.terminationReason == .exit && process.terminationStatus == 0 else {
+            guard process.terminationReason == .exit, process.terminationStatus == 0 else {
                 let problem = "\(process.terminationReason):\(process.terminationStatus)"
                 Diagnostics.error("codesign invocation failed: \(problem)")
                 return

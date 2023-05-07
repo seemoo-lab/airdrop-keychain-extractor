@@ -38,8 +38,7 @@ We build and run the extraction utility (note that you need a developer certific
 ```
 git clone https://github.com/seemoo-lab/airdrop-secret-extractor.git
 cd airdrop-secret-extractor
-swift package codesign <your developer certificate>
-./codesign.sh # Currently there is some upstream issue for SPM plugin, so we need to run this script manually
+swift package --disable-sandbox codesign <your developer certificate>
 ./airdrop-secret-extractor
 ```
 The program will ask you for a passphrase to store the key component on disk. You should now have three items in the current directory:
@@ -57,8 +56,10 @@ Your OpenDrop instance should now be discoverable as one of your devices (`recei
 
 ## 4. Known issues on SPM Plugin
 
-- [x] Plugin can't build a product with custom plugin flag. It will produce a error for unknwon link argument "-iframework"
+- [x] ~Plugin can't build a product with custom plugin flag. It will produce a error for unknwon link argument "-iframework"~
 > https://github.com/apple/swift-package-manager/issues/6512
 > Temporary solved by https://gist.github.com/Kyle-Ye/9e960dad379e0ded065be366b4233a6c
 
-- [ ] The Plugin will fail to codesign it. Error message is "One or more parameters passed to a function were not valid.". Current have no idea how to fix it.
+- [x] ~The Plugin will fail to codesign it. Error message is "One or more parameters passed to a function were not valid". Current have no idea how to fix it.~
+> Use --disable-sandbox. eg: "swift package --disable-sandbox codesign <your developer certificate>"
+
