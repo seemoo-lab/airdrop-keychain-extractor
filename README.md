@@ -57,6 +57,8 @@ Your OpenDrop instance should now be discoverable as one of your devices (`recei
 
 ## 4. Known issues on SPM Plugin
 
-- [ ] Plugin can't build a product with custom plugin flag. It will produce a error for unknwon link argument "-iframework"
+- [x] Plugin can't build a product with custom plugin flag. It will produce a error for unknwon link argument "-iframework"
 > https://github.com/apple/swift-package-manager/issues/6512
+> Temporary solved by https://gist.github.com/Kyle-Ye/9e960dad379e0ded065be366b4233a6c
+
 - [ ] The Plugin will fail to codesign it. Error message is "One or more parameters passed to a function were not valid.". Current have no idea how to fix it.

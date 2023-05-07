@@ -1,7 +1,11 @@
 // swift-tools-version: 5.8
 // The swift-tools-version declares the minimum version of Swift required to build this package.
-
+import Foundation
 import PackageDescription
+
+let isXcodeEnv = ProcessInfo.processInfo.environment["__CFBundleIdentifier"] == "com.apple.dt.Xcode"
+// Xcode use clang as linker which supports "-iframework" while SwiftPM use swiftc as linker which supports "-Fsystem"
+let systemFrameworkSearchFlag = isXcodeEnv ? "-iframework" : "-Fsystem"
 
 let package = Package(
     name: "KeychainExtractor",
@@ -9,7 +13,8 @@ let package = Package(
     products: [
         .executable(
             name: "KeychainExtractor",
-            targets: ["KeychainExtractor"]),
+            targets: ["KeychainExtractor"]
+        ),
     ],
     targets: [
         .target(name: "Sharing"),
@@ -17,8 +22,8 @@ let package = Package(
             name: "KeychainExtractor",
             dependencies: ["Sharing"],
             linkerSettings: [
-               .unsafeFlags(["-iframework", "/System/Library/PrivateFrameworks/"]),
-               .linkedFramework("Sharing"),
+                .unsafeFlags([systemFrameworkSearchFlag, "/System/Library/PrivateFrameworks/"]),
+                .linkedFramework("Sharing"),
             ]
         ),
         .plugin(
