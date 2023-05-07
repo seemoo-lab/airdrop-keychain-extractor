@@ -1,7 +1,8 @@
 # Extracting Apple ID Validation Record, Certificate, and Key for AirDrop
 
 This repository describes the process and provides the tools that allows extracting the cryptographic secrets used for Apple AirDrop's authentication protocol. The extracted secrets can be used in an open AirDrop implementation such as [OpenDrop](https://github.com/seemoo-lab/opendrop.git).
-*This procedure should work at least for macOS 10.14, 10.15, and 11.0.*
+
+*This procedure is tested on macOS 13.3.1 with Xcode 14.3*
 
 **Warning:** This procedure requires to temporarily disable some of macOS' security features! Use at your own risk.
 
@@ -18,7 +19,7 @@ We are using the Security framework to retrieve items from the system's keychain
 
 To do this, we first need to disable SIP via macOS' recovery mode. Restart your Mac and hold ⌘+R. In recovery mode, open the terminal and enter
 ```
-csrutil enable --without nvram
+csrutil disable
 ```
 and reboot the Mac. Then, add the following boot parameter via the Terminal
 ```
@@ -36,9 +37,9 @@ csrutil enable
 
 We build and run the extraction utility (note that you need a developer certificate for this):
 ```
-git clone https://github.com/seemoo-lab/airdrop-secret-extractor.git
+git clone https://github.com/Kyle-Ye/airdrop-secret-extractor.git
 cd airdrop-secret-extractor
-swift package --disable-sandbox codesign <your developer certificate>
+swift package --disable-sandbox --allow-writing-to-package-directory codesign <your developer certificate>
 ./airdrop-secret-extractor
 ```
 The program will ask you for a passphrase to store the key component on disk. You should now have three items in the current directory:
